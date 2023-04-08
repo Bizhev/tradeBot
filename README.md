@@ -24,7 +24,10 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- [SDK официальное NodeJS](https://github.com/Tinkoff/invest-openapi-js-sdk)
+- [API](https://github.com/Tinkoff/invest-openapi-js-sdk/blob/master/doc/classes/openapi.md)
+- [swagger-ui](https://tinkoff.github.io/invest-openapi/swagger-ui/)
+- [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
 ## Installation
 

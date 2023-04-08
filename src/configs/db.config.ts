@@ -4,13 +4,14 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-op
 // import { StockEntity } from '../tool/entities/stock.entity';
 // import { Country } from '../country/entities/country.entity';
 // import { Portfolio } from '../portfolio/entities/portfolio.entity';
-// import { Account } from '../user/entities/account.entity';
+// import AccountEntity from '../user/entities/account.entity';
+import UserEntity from '../user/entities/user.entity';
 // import { Profile } from '../profile/entities/profile.entity';
 // import { CurrencyEntity } from '../tool/entities/currency.entity';
 
 const entities = [
-  // User,
-  // Account,
+  UserEntity,
+  // AccountEntity,
   // StockEntity,
   // Country,
   // Portfolio,
@@ -28,5 +29,5 @@ export const getDBOptions = async (
   password: configService.get('DB_PASSWORD'),
   database: configService.get('DB_NAME'),
   entities,
-  synchronize: true,
+  synchronize: Boolean(configService.get('DB_SYNCHRONIZE')),
 });
