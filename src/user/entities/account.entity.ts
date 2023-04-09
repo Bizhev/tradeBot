@@ -15,8 +15,8 @@ export default class AccountEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // @ManyToOne((type) => UserEntity, (user) => user.accounts)
-  // user: UserEntity;
+  @ManyToOne(() => UserEntity, (user) => user.accounts)
+  user: UserEntity;
 
   // @OneToMany((type) => Portfolio, (p) => p.account)
   // portfolio: Portfolio;

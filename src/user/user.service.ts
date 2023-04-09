@@ -6,6 +6,7 @@ import AccountEntity from './entities/account.entity';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ApiService } from '../api/api.service';
 
 @Injectable()
 export class UserService {
@@ -15,6 +16,8 @@ export class UserService {
 
     @InjectRepository(AccountEntity)
     private readonly accountRepository: Repository<AccountEntity>,
+
+    private readonly apiService: ApiService,
   ) {}
   async create(createUserDto: CreateUserDto): Promise<string> {
     const user = new UserEntity();
@@ -53,5 +56,32 @@ export class UserService {
       console.error(err);
       return 'Error';
     }
+  }
+  async fetchAccounts() {
+    const localAccounts = await this.accountRepository.find();
+    const brokerAccountIds = localAccounts.map((acc) => acc.brokerAccountId);
+
+    try {
+      const users = await this.userRepository.find();
+      // const [user] = users;
+      for (const u of users) {
+        await this.apiService.useTokenOnly(u.token);
+        const accounts = await this.apiService.getAccounts();
+        for (const acc of accounts) {
+          if (!brokerAccountIds.includes(acc.brokerAccountId)) {
+            // Если не существует с таким же brokerId то записываем в БД
+            const account = new AccountEntity();
+            account.user = u;
+            account.brokerAccountId = acc.brokerAccountId;
+            account.brokerAccountType = acc.brokerAccountType;
+            await this.accountRepository.save(account);
+          }
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      return { error };
+    }
+    return 'ok';
   }
 }

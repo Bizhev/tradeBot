@@ -9,14 +9,15 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import AccountEntity from './account.entity';
 
 @Entity('User')
 export default class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // @OneToMany(() => AccountEntity, (account) => account.user)
-  // accounts: AccountEntity[];
+  @OneToMany(() => AccountEntity, (account) => account.user)
+  accounts: AccountEntity[];
 
   @Column()
   fio: string;

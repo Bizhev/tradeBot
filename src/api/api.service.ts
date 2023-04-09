@@ -10,7 +10,7 @@ import OpenAPI_, {
 import { TinekOptionInterface } from './interface/TinekOption.interface';
 import { format } from 'date-fns';
 import { LogService } from '../services/Log.service';
-import OpenAPI from '@tinkoff/invest-openapi-js-sdk';
+import * as OpenAPI from '@tinkoff/invest-openapi-js-sdk';
 import AccountEntity from '../user/entities/account.entity';
 
 @Injectable()
@@ -39,11 +39,11 @@ export class ApiService extends LogService {
       this.options.brokerAccountType = brokerAccountType || '';
 
       if (this.apiURL && this.socketURL && token) {
-        this.api = new OpenAPI({
+        this.api = new OpenAPI_({
           apiURL: this.apiURL,
           secretToken: token,
           socketURL: this.socketURL,
-          brokerAccountId,
+          brokerAccountId: undefined,
         });
       }
 
@@ -57,11 +57,33 @@ export class ApiService extends LogService {
   }
   async getAccounts(): Promise<AccountEntity[]> {
     const { accounts } = await this.api.accounts();
-    // this.accounts = accounts;
     const { brokerAccountId } = await accounts.find((name) => {
       return name.brokerAccountType === this.options.brokerAccountTypeDefault;
     });
     this.options.brokerAccountId = brokerAccountId;
     return accounts;
+  }
+
+  async useTokenOnly(token: string) {
+    const result = {
+      error: null,
+      data: null,
+    };
+    try {
+      const params = {
+        apiURL: this.apiURL,
+        secretToken: token,
+        socketURL: this.socketURL,
+        brokerAccountId: undefined,
+      };
+      if (this.apiURL && this.socketURL && token) {
+        this.api = new (OpenAPI as any as typeof OpenAPI_)(params);
+      }
+      result.data = token;
+    } catch (err) {
+      console.error(err);
+      result.error = err;
+    }
+    return result;
   }
 }

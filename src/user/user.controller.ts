@@ -36,4 +36,8 @@ export class UserController {
   async findAll() {
     return this.usersService.findAll();
   }
+  @Post('fetch-accounts')
+  async fetchAccounts() {
+    return this.usersService.fetchAccounts();
+  }
 }

@@ -4,14 +4,14 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-op
 // import { StockEntity } from '../tool/entities/stock.entity';
 // import { Country } from '../country/entities/country.entity';
 // import { Portfolio } from '../portfolio/entities/portfolio.entity';
-// import AccountEntity from '../user/entities/account.entity';
+import AccountEntity from '../user/entities/account.entity';
 import UserEntity from '../user/entities/user.entity';
 // import { Profile } from '../profile/entities/profile.entity';
 // import { CurrencyEntity } from '../tool/entities/currency.entity';
 
 const entities = [
   UserEntity,
-  // AccountEntity,
+  AccountEntity,
   // StockEntity,
   // Country,
   // Portfolio,
