@@ -8,10 +8,10 @@ import OpenAPI_, {
   UserAccounts,
 } from '@tinkoff/invest-openapi-js-sdk';
 import { TinekOptionInterface } from './interface/TinekOption.interface';
-import { format } from 'date-fns';
 import { LogService } from '../services/Log.service';
 import * as OpenAPI from '@tinkoff/invest-openapi-js-sdk';
 import AccountEntity from '../user/entities/account.entity';
+import { SetAccountInterface } from './interface/SetAccount.interface';
 
 @Injectable()
 export class ApiService extends LogService {
@@ -21,7 +21,6 @@ export class ApiService extends LogService {
   }
   apiURL = 'https://api-invest.tinkoff.ru/openapi';
   socketURL = 'wss://api-invest.tinkoff.ru/openapi/md/v1/md-openapi/ws';
-  isAuth = false;
   options: TinekOptionInterface = {
     userId: 0,
     // Может быть IIS или основной счет когда пустой.
@@ -31,28 +30,34 @@ export class ApiService extends LogService {
   };
   api: typeof OpenAPI | any = null;
 
-  async changeAccount({ userId, brokerAccountId, brokerAccountType, token }) {
-    this.isAuth = false;
+  /**
+   * Меняет активный аккаунт. */
+  async setAccount({
+    brokerAccountId,
+    userId,
+    brokerAccountType,
+    token,
+  }: SetAccountInterface) {
     try {
-      this.options.userId = userId;
+      if (userId) this.options.userId = userId;
       this.options.brokerAccountId = brokerAccountId || '';
       this.options.brokerAccountType = brokerAccountType || '';
 
+      const params = {
+        apiURL: this.apiURL,
+        secretToken: token,
+        socketURL: this.socketURL,
+        brokerAccountId,
+      };
       if (this.apiURL && this.socketURL && token) {
-        this.api = new OpenAPI_({
-          apiURL: this.apiURL,
-          secretToken: token,
-          socketURL: this.socketURL,
-          brokerAccountId: undefined,
-        });
+        this.api = new (OpenAPI as any as typeof OpenAPI_)(params);
       }
 
       this.log(
         `Изменен account, ${this.options.brokerAccountId}(${this.options.userId}) - ${this.options.brokerAccountType}`,
       );
-      this.isAuth = true;
-    } catch (e) {
-      this.log(`Ошибка при изменении аккаунта.`);
+    } catch (error) {
+      this.log(`Ошибка при изменении аккаунта:` + error);
     }
   }
   async getAccounts(): Promise<AccountEntity[]> {
@@ -86,4 +91,10 @@ export class ApiService extends LogService {
     }
     return result;
   }
+  // getUserOptions() {
+  //   if (this.options) {
+  //     return this.options;
+  //   }
+  //   return 'User is not defined!';
+  // }
 }

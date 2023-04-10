@@ -11,6 +11,7 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
+import { ChangeAccountDto } from './dto/change-account.dto';
 
 @Controller('user')
 export class UserController {
@@ -39,5 +40,9 @@ export class UserController {
   @Post('fetch-accounts')
   async fetchAccounts() {
     return this.usersService.fetchAccounts();
+  }
+  @Post('account')
+  async changeAccount(@Body() changeAccountDto: ChangeAccountDto) {
+    return this.usersService.changeAccount(changeAccountDto);
   }
 }

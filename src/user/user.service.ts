@@ -7,6 +7,9 @@ import AccountEntity from './entities/account.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ApiService } from '../api/api.service';
+import { ChangeAccountDto } from './dto/change-account.dto';
+import { IGetUser } from './interfaces/IGetUser.interface';
+import { TODO_ANY } from '../types/common';
 
 @Injectable()
 export class UserService {
@@ -29,16 +32,23 @@ export class UserService {
     await this.userRepository.save(user);
     return 'ok';
   }
+
+  /**
+   * Получает пользователя по его ID
+   * */
   async findUser(id): Promise<UserEntity> {
     const user = await this.userRepository.findOneBy({ id });
     if (user) {
       return user;
     }
-    // return ;
   }
   async findAll() {
     return this.userRepository.find();
   }
+
+  /**
+   * Обновляет данные пользователя по его ID
+   * */
   async update(data) {
     try {
       await this.userRepository.update(data.id, data);
@@ -48,6 +58,9 @@ export class UserService {
       return 'Error';
     }
   }
+  /**
+   * Удаляет пользователя по его ID
+   * */
   async delete(id) {
     try {
       await this.userRepository.delete(id);
@@ -57,6 +70,10 @@ export class UserService {
       return 'Error';
     }
   }
+
+  /**
+   * Получение аккаунтов, если нет записывает в БД, если есть пропускает.
+   * */
   async fetchAccounts() {
     const localAccounts = await this.accountRepository.find();
     const brokerAccountIds = localAccounts.map((acc) => acc.brokerAccountId);
@@ -83,5 +100,31 @@ export class UserService {
       return { error };
     }
     return 'ok';
+  }
+  async changeAccount(changeAccountDto: ChangeAccountDto) {
+    const accountWithUser: TODO_ANY = await this.getAccountWithUser({
+      brokerAccountId: changeAccountDto.brokerAccountId,
+    });
+
+    return await this.apiService.setAccount({
+      brokerAccountId: changeAccountDto.brokerAccountId,
+      userId: accountWithUser.user.id,
+      brokerAccountType: accountWithUser.brokerAccountType,
+      token: accountWithUser.user.token,
+    });
+  }
+  async getAccountWithUser({ token, brokerAccountId }: IGetUser) {
+    if (token) {
+      return await this.userRepository.findOneBy({ token });
+    }
+    if (brokerAccountId) {
+      const accounts = await this.accountRepository.find({
+        relations: ['user'],
+      });
+      const [accountWithUser] = accounts.filter(
+        (acc) => acc.brokerAccountId === brokerAccountId,
+      );
+      return accountWithUser;
+    }
   }
 }
