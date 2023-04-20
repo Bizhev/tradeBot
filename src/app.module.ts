@@ -7,6 +7,7 @@ import { getDBOptions } from './configs/db.config';
 import { UserModule } from './user/user.module';
 import { ApiModule } from './api/api.module';
 import { SettingModule } from './setting/setting.module';
+import { ToolModule } from './tool/tool.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { SettingModule } from './setting/setting.module';
     }),
     UserModule,
     SettingModule,
+    ToolModule,
   ],
   controllers: [AppController],
   providers: [AppService],

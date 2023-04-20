@@ -10,9 +10,10 @@ import { ApiService } from '../api/api.service';
 import { ChangeAccountDto } from './dto/change-account.dto';
 import { IGetUser } from './interfaces/IGetUser.interface';
 import { TODO_ANY } from '../types/common';
+import { LogService } from '../services/Log.service';
 
 @Injectable()
-export class UserService {
+export class UserService extends LogService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
@@ -21,14 +22,24 @@ export class UserService {
     private readonly accountRepository: Repository<AccountEntity>,
 
     private readonly apiService: ApiService,
-  ) {}
+  ) {
+    super('UserService');
+    this.accountRepository
+      .find()
+      .then((accounts) => {
+        const [account] = accounts;
+        this.changeAccount({ brokerAccountId: account.brokerAccountId });
+      })
+      .catch((err) => {
+        this.error(err);
+      });
+  }
   async create(createUserDto: CreateUserDto): Promise<string> {
     const user = new UserEntity();
     user.fio = createUserDto.fio;
     user.name = createUserDto.name;
     user.token = createUserDto.token;
     user.isActive = createUserDto.isActive;
-    console.log(user);
     await this.userRepository.save(user);
     return 'ok';
   }

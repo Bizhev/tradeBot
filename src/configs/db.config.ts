@@ -6,17 +6,23 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-op
 // import { Portfolio } from '../portfolio/entities/portfolio.entity';
 import AccountEntity from '../user/entities/account.entity';
 import UserEntity from '../user/entities/user.entity';
+import CurrencyEntity from '../tool/entities/currency.entity';
+import EtfEntity from '../tool/entities/etf.entity';
+import BondEntity from '../tool/entities/bond.entity';
+import StockEntity from '../tool/entities/stock.entity';
 // import { Profile } from '../profile/entities/profile.entity';
-// import { CurrencyEntity } from '../tool/entities/currency.entity';
 
 const entities = [
   UserEntity,
   AccountEntity,
+  EtfEntity,
+  BondEntity,
+  StockEntity,
+  CurrencyEntity,
   // StockEntity,
   // Country,
   // Portfolio,
   // Profile,
-  // CurrencyEntity,
 ];
 
 export const getDBOptions = async (

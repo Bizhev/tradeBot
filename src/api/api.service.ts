@@ -19,6 +19,13 @@ export class ApiService extends LogService {
     super('ApiService');
     this.log('API init');
   }
+  async test() {
+    const tool = await this.api.portfolio();
+
+    // const tool = await this.api.portfolio();
+    console.log({ tool });
+    return tool;
+  }
   apiURL = 'https://api-invest.tinkoff.ru/openapi';
   socketURL = 'wss://api-invest.tinkoff.ru/openapi/md/v1/md-openapi/ws';
   options: TinekOptionInterface = {
@@ -91,10 +98,18 @@ export class ApiService extends LogService {
     }
     return result;
   }
-  // getUserOptions() {
-  //   if (this.options) {
-  //     return this.options;
-  //   }
-  //   return 'User is not defined!';
-  // }
+  async fetchInstrumentsByType(type: InstrumentType) {
+    if (type === 'Stock') {
+      return await this.api.stocks();
+    }
+    if (type === 'Bond') {
+      return await this.api.bonds();
+    }
+    if (type === 'Etf') {
+      return await this.api.etfs();
+    }
+    if (type === 'Currency') {
+      return await this.api.currencies();
+    }
+  }
 }
