@@ -12,6 +12,8 @@ import { CreateToolDto } from './dto/create-tool.dto';
 import { UpdateToolDto } from './dto/update-tool.dto';
 import { LogService } from '../services/Log.service';
 import { TODO_ANY } from '../types/common';
+import { SettingService } from '../setting/setting.service';
+import SettingEntity from '../setting/entities/setting.entity';
 
 @Injectable()
 export class ToolService extends LogService {
@@ -28,17 +30,22 @@ export class ToolService extends LogService {
     @InjectRepository(BondEntity)
     private readonly bondRepository: Repository<BondEntity>,
 
+    private readonly settingService: SettingService,
+
     private readonly apiService: ApiService,
   ) {
     super('ToolService');
   }
   test() {
-    return this.apiService.test();
+    return 'test';
+    // return this.apiService.test();
   }
   // getTools
   async findTool(tool: string) {
     if (tool === 'test') {
-      return await this.apiService.test();
+      const t = 't';
+      return t;
+      // return await this.apiService.test();
     }
     if (tool === 'stocks') {
       await this.updateAll('Stock');

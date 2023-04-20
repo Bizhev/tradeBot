@@ -10,6 +10,7 @@ import CurrencyEntity from '../tool/entities/currency.entity';
 import EtfEntity from '../tool/entities/etf.entity';
 import BondEntity from '../tool/entities/bond.entity';
 import StockEntity from '../tool/entities/stock.entity';
+import SettingEntity from '../setting/entities/setting.entity';
 // import { Profile } from '../profile/entities/profile.entity';
 
 const entities = [
@@ -19,6 +20,7 @@ const entities = [
   BondEntity,
   StockEntity,
   CurrencyEntity,
+  SettingEntity,
   // StockEntity,
   // Country,
   // Portfolio,

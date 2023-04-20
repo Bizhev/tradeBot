@@ -7,6 +7,7 @@ import EtfEntity from './entities/etf.entity';
 import CurrencyEntity from './entities/currency.entity';
 import BondEntity from './entities/bond.entity';
 import StockEntity from './entities/stock.entity';
+import { SettingModule } from '../setting/setting.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import StockEntity from './entities/stock.entity';
       StockEntity,
     ]),
     ApiModule,
+    SettingModule,
   ],
   providers: [ToolService],
   controllers: [ToolController],

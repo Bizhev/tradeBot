@@ -11,6 +11,7 @@ import { ChangeAccountDto } from './dto/change-account.dto';
 import { IGetUser } from './interfaces/IGetUser.interface';
 import { TODO_ANY } from '../types/common';
 import { LogService } from '../services/Log.service';
+import { SettingService } from '../setting/setting.service';
 
 @Injectable()
 export class UserService extends LogService {
@@ -22,17 +23,26 @@ export class UserService extends LogService {
     private readonly accountRepository: Repository<AccountEntity>,
 
     private readonly apiService: ApiService,
+    private readonly settingService: SettingService,
   ) {
     super('UserService');
-    this.accountRepository
-      .find()
-      .then((accounts) => {
-        const [account] = accounts;
-        this.changeAccount({ brokerAccountId: account.brokerAccountId });
-      })
-      .catch((err) => {
-        this.error(err);
-      });
+    this.settingService.getSetting('lastAccountId').then((lastAccountId) => {
+      if (lastAccountId) {
+        // Если ранее сохранили в настройках то и от него и пляшем
+        this.changeAccount({ brokerAccountId: lastAccountId });
+      } else {
+        // Если не сохраняли то берем перый попавшийся
+        this.accountRepository
+          .find()
+          .then((accounts) => {
+            const [account] = accounts;
+            this.changeAccount({ brokerAccountId: account.brokerAccountId });
+          })
+          .catch((err) => {
+            this.error(err);
+          });
+      }
+    });
   }
   async create(createUserDto: CreateUserDto): Promise<string> {
     const user = new UserEntity();
@@ -116,6 +126,10 @@ export class UserService extends LogService {
     const accountWithUser: TODO_ANY = await this.getAccountWithUser({
       brokerAccountId: changeAccountDto.brokerAccountId,
     });
+    this.settingService.setSetting(
+      'lastAccountId',
+      changeAccountDto.brokerAccountId,
+    );
 
     return await this.apiService.setAccount({
       brokerAccountId: changeAccountDto.brokerAccountId,
