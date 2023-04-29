@@ -18,10 +18,8 @@ export class UserService extends LogService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-
     @InjectRepository(AccountEntity)
     private readonly accountRepository: Repository<AccountEntity>,
-
     private readonly apiService: ApiService,
     private readonly settingService: SettingService,
   ) {
@@ -44,6 +42,7 @@ export class UserService extends LogService {
       }
     });
   }
+
   async create(createUserDto: CreateUserDto): Promise<string> {
     const user = new UserEntity();
     user.fio = createUserDto.fio;
@@ -63,6 +62,7 @@ export class UserService extends LogService {
       return user;
     }
   }
+
   async findAll() {
     return this.userRepository.find();
   }
@@ -79,6 +79,7 @@ export class UserService extends LogService {
       return 'Error';
     }
   }
+
   /**
    * Удаляет пользователя по его ID
    * */
@@ -122,6 +123,7 @@ export class UserService extends LogService {
     }
     return 'ok';
   }
+
   async changeAccount(changeAccountDto: ChangeAccountDto) {
     const accountWithUser: TODO_ANY = await this.getAccountWithUser({
       brokerAccountId: changeAccountDto.brokerAccountId,
@@ -138,6 +140,7 @@ export class UserService extends LogService {
       token: accountWithUser.user.token,
     });
   }
+
   async getAccountWithUser({ token, brokerAccountId }: IGetUser) {
     if (token) {
       return await this.userRepository.findOneBy({ token });
@@ -151,5 +154,11 @@ export class UserService extends LogService {
       );
       return accountWithUser;
     }
+  }
+
+  async getAccounts() {
+    return await this.accountRepository.find({
+      relations: ['user'],
+    });
   }
 }

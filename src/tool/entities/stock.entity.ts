@@ -2,14 +2,28 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import EventEntity from './event.entity';
+import { ReportEntity } from '../../report/entities/report.entity';
+import { Trade } from '../../trade/entities/trade.entity';
 
 @Entity('Stock')
 export default class StockEntity {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @OneToMany(() => ReportEntity, (report) => report.stock)
+  reports: ReportEntity[];
+
+  @OneToMany(() => EventEntity, (event) => event.stock)
+  events: EventEntity[];
+
+  @OneToMany(() => Trade, (trade) => trade.tool)
+  trades: Trade[];
+
   @Column({ unique: true })
   figi: string;
 
@@ -34,7 +48,7 @@ export default class StockEntity {
   @Column()
   country: string;
 
-  @Column({ unique: true })
+  @Column({ unique: false })
   ticker: string;
   @Column({ default: false })
   isDeleted: boolean;

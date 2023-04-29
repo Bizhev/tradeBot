@@ -112,4 +112,7 @@ export class ApiService extends LogService {
       return await this.api.currencies();
     }
   }
+  async getPortfolio() {
+    return await this.api.portfolio();
+  }
 }

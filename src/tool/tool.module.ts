@@ -8,6 +8,8 @@ import CurrencyEntity from './entities/currency.entity';
 import BondEntity from './entities/bond.entity';
 import StockEntity from './entities/stock.entity';
 import { SettingModule } from '../setting/setting.module';
+import EventEntity from './entities/event.entity';
+import { ReportEntity } from '../report/entities/report.entity';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { SettingModule } from '../setting/setting.module';
       EtfEntity,
       BondEntity,
       StockEntity,
+      EventEntity,
+      ReportEntity,
     ]),
     ApiModule,
     SettingModule,

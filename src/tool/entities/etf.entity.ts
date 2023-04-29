@@ -2,15 +2,20 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Trade } from '../../trade/entities/trade.entity';
 
 @Entity('Etf')
 export default class EtfEntity {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column()
+  @OneToMany(() => Trade, (trade) => trade.tool)
+  trades: Trade[];
+
+  @Column({ unique: true })
   figi: string;
   @Column()
   ticker: string;

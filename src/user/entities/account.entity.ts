@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import UserEntity from './user.entity';
+import { Trade } from '../../trade/entities/trade.entity';
 // import { Portfolio } from '../../portfolio/entities/portfolio.entity';
 // import { Trade } from '../../trade/entities/trade.entity';
 @Entity('Account')
@@ -17,6 +18,9 @@ export default class AccountEntity {
 
   @ManyToOne(() => UserEntity, (user) => user.accounts)
   user: UserEntity;
+
+  @OneToMany(() => Trade, (trade) => trade.account)
+  trades: Trade[];
 
   // @OneToMany((type) => Portfolio, (p) => p.account)
   // portfolio: Portfolio;

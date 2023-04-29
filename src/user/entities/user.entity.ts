@@ -34,9 +34,6 @@ export default class UserEntity {
   @Column({ default: 0 })
   cash: number;
 
-  @Column({ default: '$' })
-  cash_type: string;
-
   @CreateDateColumn()
   created_at: Date;
 
