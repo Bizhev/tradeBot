@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import AccountEntity from '../../user/entities/account.entity';
 import { Trade } from '../../trade/entities/trade.entity';
-import {StrategyNameEnum} from "../../types/common";
+import { StrategyNameEnum } from '../../types/common';
 
 @Entity('Strategy')
 export class Strategy {
@@ -19,7 +19,7 @@ export class Strategy {
   trades: Trade[];
 
   // Name of the strategy
-  @Column({default: StrategyNameEnum.Test})
+  @Column({ default: null })
   name: StrategyNameEnum;
 
   /* Если ниже будет цена вот этой то продавать по текущим ценам
@@ -47,7 +47,7 @@ export class Strategy {
 
   // status strategy, START, PROCESS, END,
   @Column({ default: false })
-  isActive: boolean
+  isActive: boolean;
 
   // Используем лестничную продажу
   @Column({ default: false })
@@ -55,7 +55,7 @@ export class Strategy {
 
   // При урожае в такой процент закрываем позицию полностью.
   @Column({ type: 'float', default: 0 })
-  saleFullPercent: number
+  saleFullPercent: number;
 
   // Полная прибыль стратегии
   @Column({ default: 0, type: 'float' })

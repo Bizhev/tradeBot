@@ -13,7 +13,7 @@ import StockEntity from '../../tool/entities/stock.entity';
 import BondEntity from '../../tool/entities/bond.entity';
 import EtfEntity from '../../tool/entities/etf.entity';
 import CurrencyEntity from '../../tool/entities/currency.entity';
-import {TradeStatusEnum} from "../../types/common";
+import { ToolType, TradeStatusEnum } from '../../types/common';
 
 @Entity('Trade')
 export class Trade {
@@ -30,7 +30,7 @@ export class Trade {
     () => StockEntity || BondEntity || EtfEntity || CurrencyEntity,
     (tool) => tool.figi,
   )
-  tool: StockEntity | BondEntity | EtfEntity | CurrencyEntity;
+  tool: ToolType;
 
   // latin name, group_name
   @Column({ default: 'others' })
@@ -48,19 +48,27 @@ export class Trade {
   priceStartStrategy: number;
 
   /** Maximum price */
-  @Column({ type: 'float' })
-  priceMax: number;
+  // @Column({ type: 'float' })
+  // priceMax: number;
+
+  // Средняя стоимость актива
+  @Column({ type: 'float', default: null })
+  priceAverage: number;
+
+  // Количество позиции
+  @Column({ default: 0, type: 'float' })
+  lots: number;
 
   // С какой цены начали работу
   @Column({ default: 0, type: 'float' })
   priceStarted: number;
 
   // Начала работы торговлю, указывается автоматом
-  @Column()
+  @Column({ default: null })
   startTradeDate: Date;
 
   // Закончил Торговлю
-  @Column()
+  @Column({ default: null })
   endTradeDate: Date;
 
   @CreateDateColumn()

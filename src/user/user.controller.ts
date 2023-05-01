@@ -45,4 +45,10 @@ export class UserController {
   async changeAccount(@Body() changeAccountDto: ChangeAccountDto) {
     return this.usersService.changeAccount(changeAccountDto);
   }
+  @Get('account/:brokerAccountId')
+  async findOneAccount(@Param('brokerAccountId') brokerAccountId) {
+    return this.usersService.getAccountWithUser({
+      brokerAccountId: brokerAccountId,
+    });
+  }
 }

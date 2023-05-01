@@ -165,6 +165,20 @@ export class ToolService extends LogService {
   async getToolByTicker(ticker: CreateToolDto) {
     return await this.stockRepository.findOneBy({ ticker: ticker.ticker });
   }
+  async getToolByFigi(figi: string) {
+    const figiStock = await this.stockRepository.findOneBy({ figi });
+    if (figiStock) return figiStock;
+
+    const figiBond = await this.bondRepository.findOneBy({ figi });
+    if (figiBond) return figiBond;
+
+    const figiEtf = await this.etfRepository.findOneBy({ figi });
+    if (figiEtf) return figiEtf;
+
+    const figiCurrency = await this.currencyRepository.findOneBy({ figi });
+    if (figiCurrency) return figiCurrency;
+  }
+
   async update(
     id: number,
     updateToolDto: UpdateToolDto,
@@ -280,5 +294,9 @@ export class ToolService extends LogService {
     if (type === 'Currency') {
       return await this.currencyRepository.find();
     }
+  }
+
+  async setToolPrice(tool: TODO_ANY) {
+    console.log({ tool });
   }
 }

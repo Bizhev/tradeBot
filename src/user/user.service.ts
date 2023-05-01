@@ -155,6 +155,11 @@ export class UserService extends LogService {
       return accountWithUser;
     }
   }
+  async getAccountByBrokerId({ brokerAccountId }) {
+    return this.accountRepository.findOneBy({
+      brokerAccountId: brokerAccountId,
+    });
+  }
 
   async getAccounts() {
     return await this.accountRepository.find({

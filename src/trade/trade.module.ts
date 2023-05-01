@@ -3,9 +3,19 @@ import { TradeService } from './trade.service';
 import { TradeController } from './trade.controller';
 import { UserModule } from '../user/user.module';
 import { ApiModule } from '../api/api.module';
+import { StrategyModule } from '../strategy/strategy.module';
+import { ToolModule } from '../tool/tool.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Trade } from './entities/trade.entity';
 
 @Module({
-  imports: [UserModule, ApiModule],
+  imports: [
+    TypeOrmModule.forFeature([Trade]),
+    UserModule,
+    ApiModule,
+    StrategyModule,
+    ToolModule,
+  ],
   controllers: [TradeController],
   providers: [TradeService],
 })

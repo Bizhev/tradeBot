@@ -30,7 +30,6 @@ const entities = [
   ReportEntity,
   Strategy,
   Trade,
-  // StockEntity,
   // Country,
   // Portfolio,
   // Profile,

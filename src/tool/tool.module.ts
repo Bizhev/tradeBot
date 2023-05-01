@@ -26,5 +26,6 @@ import { ReportEntity } from '../report/entities/report.entity';
   ],
   providers: [ToolService],
   controllers: [ToolController],
+  exports: [ToolService],
 })
 export class ToolModule {}
