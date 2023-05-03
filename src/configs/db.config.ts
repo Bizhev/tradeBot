@@ -15,6 +15,7 @@ import EventEntity from '../tool/entities/event.entity';
 import { ReportEntity } from '../report/entities/report.entity';
 import { Strategy } from '../strategy/entities/strategy.entity';
 import { Trade } from '../trade/entities/trade.entity';
+import { CurrencyTrade } from '../currency-trade/entities/currency-trade.entity';
 // import { Trade } from '../profile/entities/profile.entity';
 // import { Profile } from '../profile/entities/profile.entity';
 
@@ -30,6 +31,7 @@ const entities = [
   ReportEntity,
   Strategy,
   Trade,
+  CurrencyTrade,
   // Country,
   // Portfolio,
   // Profile,

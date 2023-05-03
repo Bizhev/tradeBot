@@ -13,7 +13,11 @@ import StockEntity from '../../tool/entities/stock.entity';
 import BondEntity from '../../tool/entities/bond.entity';
 import EtfEntity from '../../tool/entities/etf.entity';
 import CurrencyEntity from '../../tool/entities/currency.entity';
-import { ToolType, TradeStatusEnum } from '../../types/common';
+import {
+  OrderOperationType,
+  ToolType,
+  TradeStatusEnum,
+} from '../../types/common';
 
 @Entity('Trade')
 export class Trade {
@@ -59,6 +63,14 @@ export class Trade {
   @Column({ default: 0, type: 'float' })
   lots: number;
 
+  // Количество позиции
+  @Column({ default: 'Buy' })
+  operation: OrderOperationType;
+
+  // type tool
+  @Column()
+  type: string;
+
   // С какой цены начали работу
   @Column({ default: 0, type: 'float' })
   priceStarted: number;
@@ -66,6 +78,18 @@ export class Trade {
   // Начала работы торговлю, указывается автоматом
   @Column({ default: null })
   startTradeDate: Date;
+
+  @Column({ default: null })
+  currency: string;
+
+  @Column({ default: 0 })
+  price: number;
+
+  @Column({ default: 0 })
+  balance: number;
+
+  @Column({ default: 0 })
+  orderId: number;
 
   // Закончил Торговлю
   @Column({ default: null })

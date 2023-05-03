@@ -14,6 +14,7 @@ import { ToolJobModule } from './tool-job/tool-job.module';
 import { TradeModule } from './trade/trade.module';
 import { StrategyModule } from './strategy/strategy.module';
 import { CompanyModule } from './company/company.module';
+import { CurrencyTradeModule } from './currency-trade/currency-trade.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { CompanyModule } from './company/company.module';
     TradeModule,
     StrategyModule,
     CompanyModule,
+    CurrencyTradeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

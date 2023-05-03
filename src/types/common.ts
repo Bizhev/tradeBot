@@ -16,3 +16,9 @@ export enum StrategyNameEnum {
 }
 
 export type ToolType = StockEntity | BondEntity | EtfEntity | CurrencyEntity;
+
+// Operations
+export enum OrderOperationType {
+  Sell = 'Sell',
+  Buy = 'Buy',
+}

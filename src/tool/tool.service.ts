@@ -11,7 +11,7 @@ import BondEntity from './entities/bond.entity';
 import { CreateToolDto } from './dto/create-tool.dto';
 import { UpdateToolDto } from './dto/update-tool.dto';
 import { LogService } from '../services/Log.service';
-import { TODO_ANY } from '../types/common';
+import { TODO_ANY, ToolType } from '../types/common';
 import { SettingService } from '../setting/setting.service';
 import SettingEntity from '../setting/entities/setting.entity';
 
@@ -165,7 +165,7 @@ export class ToolService extends LogService {
   async getToolByTicker(ticker: CreateToolDto) {
     return await this.stockRepository.findOneBy({ ticker: ticker.ticker });
   }
-  async getToolByFigi(figi: string) {
+  async getToolByFigi(figi: string): Promise<ToolType> {
     const figiStock = await this.stockRepository.findOneBy({ figi });
     if (figiStock) return figiStock;
 

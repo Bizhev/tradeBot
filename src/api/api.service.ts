@@ -12,6 +12,7 @@ import { LogService } from '../services/Log.service';
 import * as OpenAPI from '@tinkoff/invest-openapi-js-sdk';
 import AccountEntity from '../user/entities/account.entity';
 import { SetAccountInterface } from './interface/SetAccount.interface';
+import { OrderOperationType } from '../types/common';
 
 @Injectable()
 export class ApiService extends LogService {
@@ -45,26 +46,30 @@ export class ApiService extends LogService {
     brokerAccountType,
     token,
   }: SetAccountInterface) {
-    try {
-      if (userId) this.options.userId = userId;
-      this.options.brokerAccountId = brokerAccountId || '';
-      this.options.brokerAccountType = brokerAccountType || '';
+    if (this.options.brokerAccountId !== brokerAccountId && brokerAccountId) {
+      try {
+        if (userId) this.options.userId = userId;
+        this.options.brokerAccountId = brokerAccountId || '';
+        this.options.brokerAccountType = brokerAccountType || '';
 
-      const params = {
-        apiURL: this.apiURL,
-        secretToken: token,
-        socketURL: this.socketURL,
-        brokerAccountId,
-      };
-      if (this.apiURL && this.socketURL && token) {
-        this.api = new (OpenAPI as any as typeof OpenAPI_)(params);
+        const params = {
+          apiURL: this.apiURL,
+          secretToken: token,
+          socketURL: this.socketURL,
+          brokerAccountId,
+        };
+        if (this.apiURL && this.socketURL && token) {
+          this.api = new (OpenAPI as any as typeof OpenAPI_)(params);
+        }
+
+        this.log(
+          `Изменен account, ${this.options.brokerAccountId}(${this.options.userId}) - ${this.options.brokerAccountType}`,
+        );
+      } catch (error) {
+        this.log(`Ошибка при изменении аккаунта:` + error);
       }
-
-      this.log(
-        `Изменен account, ${this.options.brokerAccountId}(${this.options.userId}) - ${this.options.brokerAccountType}`,
-      );
-    } catch (error) {
-      this.log(`Ошибка при изменении аккаунта:` + error);
+    } else {
+      // this.warn('Тот же аккаунт');
     }
   }
   async getAccounts(): Promise<AccountEntity[]> {
@@ -114,5 +119,36 @@ export class ApiService extends LogService {
   }
   async getPortfolio() {
     return await this.api.portfolio();
+  }
+  async orderbookGet({ figi }) {
+    //  Получение стака по фиги
+    return this.api.orderbookGet({ figi });
+  }
+  async limitOrder({
+    figi,
+    lots,
+    operation,
+    price,
+  }: {
+    figi: string;
+    lots: number;
+    operation: OrderOperationType;
+    price: number;
+  }) {
+    // Устонавливает активнуюзаявку
+    return this.api.limitOrder({ figi, lots, operation, price });
+  }
+  async cancelOrder({ orderId }) {
+    // отменяет активную заявку
+    return this.api.cancelOrder({ orderId });
+  }
+  // Получаем все активные заявки
+  async orders() {
+    // отменяет активную заявку
+    return this.api.orders();
+  }
+  async portfolioCurrencies() {
+    // Метод для получения валютных активов клиента
+    return this.api.portfolioCurrencies();
   }
 }

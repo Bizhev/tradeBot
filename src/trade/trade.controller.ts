@@ -19,6 +19,19 @@ export class TradeController {
   create(@Body() createTradeDto: CreateTradeDto) {
     return this.tradeService.create(createTradeDto);
   }
+  @Get('/test')
+  test() {
+    return this.tradeService.test();
+  }
+  @Get('/cheack-trade')
+  cheackTrade() {
+    return this.tradeService.checkTrade();
+  }
+
+  @Get('/update-currency-portfolio')
+  updateCurrencyPortfolio() {
+    return this.tradeService.updateCurrencyPortfolio();
+  }
 
   @Get()
   findAll() {

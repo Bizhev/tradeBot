@@ -132,13 +132,18 @@ export class UserService extends LogService {
       'lastAccountId',
       changeAccountDto.brokerAccountId,
     );
-
-    return await this.apiService.setAccount({
-      brokerAccountId: changeAccountDto.brokerAccountId,
-      userId: accountWithUser.user.id,
-      brokerAccountType: accountWithUser.brokerAccountType,
-      token: accountWithUser.user.token,
-    });
+    try {
+      await this.apiService.setAccount({
+        brokerAccountId: changeAccountDto.brokerAccountId,
+        userId: accountWithUser.user.id,
+        brokerAccountType: accountWithUser.brokerAccountType,
+        token: accountWithUser.user.token,
+      });
+      return true;
+    } catch (err) {
+      this.error(`${err.message}`);
+      return false;
+    }
   }
 
   async getAccountWithUser({ token, brokerAccountId }: IGetUser) {
@@ -162,8 +167,12 @@ export class UserService extends LogService {
   }
 
   async getAccounts() {
-    return await this.accountRepository.find({
-      relations: ['user'],
+    return (
+      await this.accountRepository.find({
+        relations: ['user'],
+      })
+    ).filter((acc) => {
+      return acc.active;
     });
   }
 }

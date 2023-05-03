@@ -9,6 +9,8 @@ import {
 } from 'typeorm';
 import UserEntity from './user.entity';
 import { Trade } from '../../trade/entities/trade.entity';
+import CurrencyEntity from '../../tool/entities/currency.entity';
+import { CurrencyTrade } from '../../currency-trade/entities/currency-trade.entity';
 // import { Portfolio } from '../../portfolio/entities/portfolio.entity';
 // import { Trade } from '../../trade/entities/trade.entity';
 @Entity('Account')
@@ -21,6 +23,9 @@ export default class AccountEntity {
 
   @OneToMany(() => Trade, (trade) => trade.account)
   trades: Trade[];
+
+  @OneToMany(() => CurrencyTrade, (currencyTrade) => currencyTrade.account)
+  currencyTrades: CurrencyTrade[];
 
   // @OneToMany((type) => Portfolio, (p) => p.account)
   // portfolio: Portfolio;
@@ -45,9 +50,11 @@ export default class AccountEntity {
   //
   // @Column({ default: 0 })
   // freeRub: number;
-
   @Column()
   brokerAccountType: string;
+
+  @Column({ default: false })
+  active: boolean;
 
   @Column()
   brokerAccountId: string;

@@ -18,4 +18,5 @@ export class CreateTradeDto {
   priceAverage?: number;
   priceStarted?: number;
   status: TradeStatusEnum;
+  type: string;
 }

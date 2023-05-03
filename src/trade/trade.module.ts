@@ -7,16 +7,20 @@ import { StrategyModule } from '../strategy/strategy.module';
 import { ToolModule } from '../tool/tool.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Trade } from './entities/trade.entity';
+import { CurrencyTradeModule } from '../currency-trade/currency-trade.module';
+import { CurrencyTradeService } from '../currency-trade/currency-trade.service';
+import { CurrencyTrade } from '../currency-trade/entities/currency-trade.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Trade]),
+    TypeOrmModule.forFeature([Trade, CurrencyTrade]),
     UserModule,
     ApiModule,
     StrategyModule,
     ToolModule,
+    CurrencyTradeModule,
   ],
   controllers: [TradeController],
-  providers: [TradeService],
+  providers: [TradeService, CurrencyTradeService],
 })
 export class TradeModule {}

@@ -50,6 +50,10 @@ export default class StockEntity {
 
   @Column({ unique: false })
   ticker: string;
+
+  @Column({ default: 0, type: 'float' })
+  price: number;
+
   @Column({ default: false })
   isDeleted: boolean;
 
