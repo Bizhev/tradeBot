@@ -188,7 +188,18 @@ export class TradeService extends LogService {
     // });
     // const x = await this.apiService.cancelOrder({ orderId: '35792891788' });
     // const x = await this.apiService.orders();
-    const x = await this.apiService.portfolioCurrencies();
+    // const x = await this.apiService.portfolioCurrencies();
+
+    const accounts = await this.userService.getAccounts();
+    const x = [];
+    for (const account of accounts) {
+      await this.userService.changeAccount({
+        brokerAccountId: account.brokerAccountId,
+      });
+      const p = await await this.apiService.getPortfolio();
+      x.push(p);
+    }
+    // const x = await this.apiService.getPortfolio();
     return x;
   }
   async checkTrade() {

@@ -38,7 +38,8 @@ export class CurrencyTradeService extends LogService {
   update(id: number, updateCurrencyTradeDto: UpdateCurrencyTradeDto) {
     const cur = new CreateCurrencyTradeDto();
     cur.value = updateCurrencyTradeDto.value;
-    return this.currencyTrade.update(id, { value: cur.value });
+    cur.blocked = updateCurrencyTradeDto.blocked;
+    return this.currencyTrade.update(id, cur);
   }
 
   remove(id: number) {
