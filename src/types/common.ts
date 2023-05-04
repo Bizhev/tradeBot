@@ -22,3 +22,12 @@ export enum OrderOperationType {
   Sell = 'Sell',
   Buy = 'Buy',
 }
+
+export enum TradePortfolioFrom {
+  Portfolio = 'portfolio',
+}
+export enum TradeCurrency {
+  RUB = 'RUB',
+  USD = 'USD',
+  CNY = 'CNY',
+}

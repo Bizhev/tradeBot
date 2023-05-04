@@ -1,13 +1,25 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateTradeDto } from './create-trade.dto';
-import { StrategyNameEnum, TradeStatusEnum } from '../../types/common';
+import {
+  OrderOperationType,
+  StrategyNameEnum,
+  TODO_ANY,
+  TradeCurrency,
+  TradeStatusEnum,
+} from '../../types/common';
 
 export class UpdateTradeDto extends PartialType(CreateTradeDto) {
-  strategy: StrategyNameEnum;
-  brokerAccountId: string;
-  tool: string;
+  strategy?: StrategyNameEnum;
   name: string;
+  lots: number;
   description: string;
-  priceStartStrategy: number;
-  status: TradeStatusEnum;
+  status?: TradeStatusEnum;
+  priceAverage?: number;
+  operation?: OrderOperationType;
+  price: number;
+  balance?: number;
+  currency?: TradeCurrency;
+
+  // orderId?: TODO_ANY;
+  // endTradeDate?: TODO_ANY;
 }

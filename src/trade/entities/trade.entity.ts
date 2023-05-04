@@ -63,6 +63,9 @@ export class Trade {
   @Column({ default: 0, type: 'float' })
   lots: number;
 
+  @Column({ default: 'default' })
+  from: string;
+
   // Количество позиции
   @Column({ default: 'Buy' })
   operation: OrderOperationType;
@@ -82,7 +85,7 @@ export class Trade {
   @Column({ default: null })
   currency: string;
 
-  @Column({ default: 0 })
+  @Column({ default: 0, type: 'float' })
   price: number;
 
   @Column({ default: 0 })

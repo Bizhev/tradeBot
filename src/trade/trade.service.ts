@@ -12,14 +12,10 @@ import { Repository } from 'typeorm';
 import {
   OrderOperationType,
   StrategyNameEnum,
-  TODO_ANY,
+  TradePortfolioFrom,
   TradeStatusEnum,
 } from '../types/common';
-import {
-  Orderbook,
-  Portfolio,
-  PortfolioCurrenciesResponse,
-} from '@tinkoff/invest-openapi-js-sdk';
+import { Orderbook } from '@tinkoff/invest-openapi-js-sdk';
 import { CurrencyTradeService } from '../currency-trade/currency-trade.service';
 import { Currencies } from '@tinkoff/invest-openapi-js-sdk/build/domain';
 
@@ -49,23 +45,24 @@ export class TradeService extends LogService {
     });
     trade.tool = await this.toolService.getToolByFigi(createTradeDto.tool);
 
-    trade.status = createTradeDto.status;
     trade.name = createTradeDto.name;
     trade.lots = createTradeDto.lots;
+    trade.from = createTradeDto.from;
     trade.description = createTradeDto.description;
     trade.priceStartStrategy = createTradeDto.priceStartStrategy;
     trade.priceAverage = createTradeDto.priceAverage;
     trade.priceStarted = createTradeDto.priceStarted;
+    trade.status = createTradeDto.status;
     trade.type = createTradeDto.type;
-
-    if (!trade.tool) {
-      this.warn(`Need first update this tool: ${trade.name}`);
-      // TODO: need update tool
-    } else {
+    trade.price = createTradeDto.price;
+    trade.balance = createTradeDto.balance;
+    trade.currency = createTradeDto.currency;
+    try {
       await this.tradeRepository.save(trade);
+      return true;
+    } catch (err) {
+      return false;
     }
-
-    return trade;
   }
 
   async findAll() {
@@ -92,8 +89,28 @@ export class TradeService extends LogService {
     return null;
   }
 
-  update(id: number, updateTradeDto: UpdateTradeDto) {
-    return `This action updates a #${id} trade`;
+  async update(id: number, updateTradeDto: UpdateTradeDto) {
+    const trade = new Trade();
+
+    trade.strategy = await this.strategyService.findOneByName(
+      updateTradeDto.strategy,
+    );
+
+    trade.name = updateTradeDto.name;
+    trade.lots = updateTradeDto.lots;
+    trade.description = updateTradeDto.description;
+    trade.status = updateTradeDto.status;
+    trade.priceAverage = updateTradeDto.priceAverage;
+    trade.operation = updateTradeDto.operation;
+    trade.price = updateTradeDto.price;
+    trade.balance = updateTradeDto.balance;
+    trade.currency = updateTradeDto.currency;
+    try {
+      await this.tradeRepository.update(id, trade);
+      return true;
+    } catch (err) {
+      return false;
+    }
   }
 
   remove(id: number) {
@@ -104,68 +121,112 @@ export class TradeService extends LogService {
     const accountsWithUser = await this.userService.getAccounts();
     try {
       for (const acc of accountsWithUser) {
-        // await this.userService.changeAccount({
-        //   brokerAccountId: acc.brokerAccountId,
-        // });
-        await this.apiService.setAccount({
+        await this.userService.changeAccount({
           brokerAccountId: acc.brokerAccountId,
-          token: acc.user.token,
-          brokerAccountType: acc.brokerAccountType,
         });
         this.log(
           ` [[[${acc.user.name}]]] ${acc.brokerAccountId} ${acc.brokerAccountType}`,
         );
 
         const { positions } = await this.apiService.getPortfolio();
-        const trades = await this.tradeRepository.find({
-          relations: ['account', 'tool'],
+
+        const trades = (
+          await this.tradeRepository.find({
+            relations: ['account', 'tool'],
+          })
+        ).filter((tr) => {
+          return tr.account.brokerAccountId === acc.brokerAccountId;
         });
+        // return { trades, positions };
 
-        if (positions.length > 0) {
-          // If then positions
-          for (const pos of positions) {
-            const [trade] = trades.filter((tr) => {
-              return (
-                tr.account.brokerAccountId === acc.brokerAccountId &&
-                tr.tool.figi === pos.figi
-              );
-            });
+        //
+        const tradesCreate: {
+          type: string;
+          data: CreateTradeDto;
+        }[] = [];
+        const tradesUpdate: {
+          figi: string;
+          id: number;
+          data: UpdateTradeDto;
+        }[] = [];
 
-            if (!trade) {
-              if (pos.instrumentType === 'Stock') {
-                // FIXME: Deletet this type, need all type
-                this.log(
-                  `Adding new trade: ${acc.user.name} with ${pos.name} ${trade} ${acc.brokerAccountId} ${pos.figi}`,
-                );
+        for (const position of positions) {
+          const price = +(
+            position.averagePositionPrice.value +
+            position.expectedYield.value / position.balance
+          ).toFixed(2);
 
-                await this.create({
-                  strategy: StrategyNameEnum.Default,
-                  brokerAccountId: acc.brokerAccountId,
-                  tool: pos.figi,
-                  name: pos.name,
-                  description: 'added auto portfolio update',
-                  priceStartStrategy: 0,
-                  lots: pos.lots,
-                  status: TradeStatusEnum.End,
-                  type: pos.instrumentType,
-                  priceAverage: pos.averagePositionPrice.value,
-                  priceStarted: pos.averagePositionPrice.value,
-                });
-              } else if (pos.instrumentType === 'Bond') {
-                // this.warn(`${pos.name}, ${pos.lots}, ${acc.name}`);
-              } else if (pos.instrumentType === 'Currency') {
-                // this.warn(`${pos.name}, ${pos.lots}, ${acc.name}`);
-              } else if (pos.instrumentType === 'Etf') {
-                // this.warn(`${pos.name}, ${pos.lots}, ${acc.name}`);
-              }
-            } else {
-              // TODO NEED UPDATE ME
-              this.warn(`UPDATE MAYBE::: ${acc.user.name}`);
+          // Собираем  данные для обновления
+          for (const trade of trades) {
+            if (position.ticker === trade.tool.ticker) {
+              tradesUpdate.push({
+                figi: position.figi,
+                id: trade.id,
+                data: {
+                  name: position.name,
+                  description:
+                    trade.lots === position.lots
+                      ? trade.description
+                      : `${trade.description}. old:${trade.lots} new:${position.lots}`,
+                  lots: position.lots,
+                  priceAverage: position.averagePositionPrice.value,
+                  price,
+                  balance: position.balance,
+                  currency: position.averagePositionPrice.currency,
+                },
+              });
             }
-            // const tool = await this.toolService.getToolByFigi(pos.figi);
+          }
+
+          const [TU] = tradesUpdate.filter((tu) => {
+            return tu.figi === position.figi;
+          });
+          // console.log({ TU });
+          if (!TU) {
+            // Если пусто то создаем новый
+            tradesCreate.push({
+              type: position.instrumentType,
+              data: {
+                strategy: StrategyNameEnum.Default,
+                brokerAccountId: acc.brokerAccountId,
+                tool: position.figi,
+                name: position.name,
+                lots: position.lots,
+                from: TradePortfolioFrom.Portfolio,
+                description: 'adding in portfolio',
+                priceStartStrategy: 0,
+                priceStarted: position.averagePositionPrice.value,
+                priceAverage: position.averagePositionPrice.value,
+                status: TradeStatusEnum.Process,
+                type: position.instrumentType,
+                price,
+                balance: position.balance,
+                currency: position.averagePositionPrice.currency,
+              },
+            });
           }
         }
-        this.log(`ok`);
+
+        this.warn(
+          `update: ${tradesUpdate.length} create: ${tradesCreate.length}`,
+        );
+
+        for (const TUpdate of tradesUpdate) {
+          await this.update(TUpdate.id, TUpdate.data);
+        }
+        for (const TCreate of tradesCreate) {
+          //FIXME
+          // if (TCreate.type === 'Stock') await this.create(TCreate);
+          if (TCreate.type === 'Stock') {
+            await this.create(TCreate.data);
+          }
+          // if (TCreate.type === 'Bond') {
+          //   await this.create(TCreate.data);
+          // }
+          // if (TCreate.type === 'Currency') {
+          //   await this.create(TCreate.data);
+          // }
+        }
         /***
          * Проверка портфеля.
          * **/
