@@ -11,13 +11,11 @@ import UserEntity from './user.entity';
 import { Trade } from '../../trade/entities/trade.entity';
 import CurrencyEntity from '../../tool/entities/currency.entity';
 import { CurrencyTrade } from '../../currency-trade/entities/currency-trade.entity';
+import { BaseEntityService } from '../../services/BaseEntity.service';
 // import { Portfolio } from '../../portfolio/entities/portfolio.entity';
 // import { Trade } from '../../trade/entities/trade.entity';
 @Entity('Account')
-export default class AccountEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export default class AccountEntity extends BaseEntityService {
   @ManyToOne(() => UserEntity, (user) => user.accounts)
   user: UserEntity;
 
@@ -62,10 +60,4 @@ export default class AccountEntity {
   // Общее количество инструментов
   // @Column({ default: 0 })
   // allCount: number;
-
-  @CreateDateColumn()
-  created_at: Date;
-
-  @UpdateDateColumn()
-  updated_at: Date;
 }

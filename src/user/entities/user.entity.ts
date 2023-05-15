@@ -10,12 +10,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import AccountEntity from './account.entity';
+import { BaseEntityService } from '../../services/BaseEntity.service';
 
 @Entity('User')
-export default class UserEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export default class UserEntity extends BaseEntityService {
   @OneToMany(() => AccountEntity, (account) => account.user)
   accounts: AccountEntity[];
 
@@ -33,10 +31,4 @@ export default class UserEntity {
 
   @Column({ default: 0 })
   cash: number;
-
-  @CreateDateColumn()
-  created_at: Date;
-
-  @UpdateDateColumn()
-  updated_at: Date;
 }

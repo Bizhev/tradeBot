@@ -10,6 +10,7 @@ import {
 import { TradeService } from './trade.service';
 import { CreateTradeDto } from './dto/create-trade.dto';
 import { UpdateTradeDto } from './dto/update-trade.dto';
+import { ChangeAccountDto } from '../user/dto/change-account.dto';
 
 @Controller('trade')
 export class TradeController {
@@ -23,9 +24,13 @@ export class TradeController {
   test() {
     return this.tradeService.test();
   }
-  @Get('/cheack-trade')
+  @Get('/check-trade')
   cheackTrade() {
     return this.tradeService.checkTrade();
+  }
+  @Post('/check-trade')
+  cheackStrategy(@Body() { strategyName }) {
+    return this.tradeService.checkTradeByStrategy(strategyName);
   }
 
   @Get('/update-currency-portfolio')

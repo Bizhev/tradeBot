@@ -146,7 +146,10 @@ export class UserService extends LogService {
     }
   }
 
-  async getAccountWithUser({ token, brokerAccountId }: IGetUser) {
+  async getAccountWithUser({
+    token,
+    brokerAccountId,
+  }: IGetUser): Promise<AccountEntity | UserEntity> {
     if (token) {
       return await this.userRepository.findOneBy({ token });
     }

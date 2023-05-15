@@ -18,12 +18,10 @@ import {
   ToolType,
   TradeStatusEnum,
 } from '../../types/common';
+import { BaseEntityService } from '../../services/BaseEntity.service';
 
 @Entity('Trade')
-export class Trade {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class Trade extends BaseEntityService {
   @ManyToOne(() => Strategy, (strategy) => strategy.trades)
   strategy: Strategy;
 
@@ -32,7 +30,9 @@ export class Trade {
 
   @ManyToOne(
     () => StockEntity || BondEntity || EtfEntity || CurrencyEntity,
-    (tool) => tool.figi,
+    (tool: ToolType) => {
+      return tool.figi;
+    },
   )
   tool: ToolType;
 
@@ -48,7 +48,7 @@ export class Trade {
   status: TradeStatusEnum;
 
   /** какой цены начать позицию */
-  @Column({ type: 'float' })
+  @Column({ type: 'float', default: 0 })
   priceStartStrategy: number;
 
   /** Maximum price */
@@ -97,10 +97,4 @@ export class Trade {
   // Закончил Торговлю
   @Column({ default: null })
   endTradeDate: Date;
-
-  @CreateDateColumn()
-  created_at: Date;
-
-  @UpdateDateColumn()
-  updated_at: Date;
 }

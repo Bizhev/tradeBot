@@ -12,12 +12,15 @@ import { Repository } from 'typeorm';
 import {
   OrderOperationType,
   StrategyNameEnum,
+  TODO_ANY,
   TradePortfolioFrom,
   TradeStatusEnum,
 } from '../types/common';
 import { Orderbook } from '@tinkoff/invest-openapi-js-sdk';
 import { CurrencyTradeService } from '../currency-trade/currency-trade.service';
 import { Currencies } from '@tinkoff/invest-openapi-js-sdk/build/domain';
+import UserEntity from '../user/entities/user.entity';
+import AccountEntity from '../user/entities/account.entity';
 
 @Injectable()
 export class TradeService extends LogService {
@@ -31,6 +34,39 @@ export class TradeService extends LogService {
     private readonly currencyTradeService: CurrencyTradeService,
   ) {
     super('Trade');
+
+    const CHECK_POSITIONS_TRADE: CreateTradeDto = {
+      strategy: StrategyNameEnum.Default,
+      brokerAccountId: '2045709694',
+      name: 'CHECK_POSITIONS',
+      description: 'Чекает цену',
+      type: 'Stock',
+      status: 1,
+    };
+
+    this.userService
+      .getAccountWithUser({
+        brokerAccountId: CHECK_POSITIONS_TRADE.brokerAccountId,
+      })
+      .then((account) => {
+        if (account instanceof AccountEntity) {
+          this.tradeRepository
+            .findOneBy({ name: CHECK_POSITIONS_TRADE.name })
+            .then((trade) => {
+              if (!trade) {
+                this.create(CHECK_POSITIONS_TRADE)
+                  .then((tradeNew) => {
+                    this.log(
+                      `Created first trade for cheacking price with account`,
+                    );
+                  })
+                  .catch((err) => {
+                    this.error(err.message);
+                  });
+              }
+            });
+        }
+      });
   }
 
   async create(createTradeDto: CreateTradeDto) {
@@ -43,7 +79,9 @@ export class TradeService extends LogService {
     trade.account = await this.userService.getAccountByBrokerId({
       brokerAccountId: createTradeDto.brokerAccountId,
     });
-    trade.tool = await this.toolService.getToolByFigi(createTradeDto.tool);
+    if (createTradeDto.tool) {
+      trade.tool = await this.toolService.getToolByFigi(createTradeDto.tool);
+    }
 
     trade.name = createTradeDto.name;
     trade.lots = createTradeDto.lots;
@@ -61,7 +99,9 @@ export class TradeService extends LogService {
       await this.tradeRepository.save(trade);
       return true;
     } catch (err) {
-      return false;
+      const error = { data: false, message: err.message };
+      this.error(`${error.message}`);
+      return error;
     }
   }
 
@@ -240,30 +280,32 @@ export class TradeService extends LogService {
     return 'ok';
   }
   async test() {
-    const [{ tool }] = await this.tradeRepository.find({ relations: ['tool'] });
-    // const x = await this.apiService.limitOrder({
-    //   figi: tool.figi,
-    //   price: 950,
-    //   operation: OrderOperationType.Buy,
-    //   lots: 1,
-    // });
+    // const [{ tool }] = await this.tradeRepository.find({ relations: ['tool'] });
+    await this.userService.changeAccount({ brokerAccountId: '2050099924' });
+    const x = await this.apiService.limitOrder({
+      figi: 'BBG00475K6C3',
+      price: 960,
+      operation: OrderOperationType.Buy,
+      lots: 1,
+    });
     // const x = await this.apiService.cancelOrder({ orderId: '35792891788' });
     // const x = await this.apiService.orders();
     // const x = await this.apiService.portfolioCurrencies();
 
-    const accounts = await this.userService.getAccounts();
-    const x = [];
-    for (const account of accounts) {
-      await this.userService.changeAccount({
-        brokerAccountId: account.brokerAccountId,
-      });
-      const p = await await this.apiService.getPortfolio();
-      x.push(p);
-    }
+    // const accounts = await this.userService.getAccounts();
+    // const x = [];
+    // for (const account of accounts) {
+    //   await this.userService.changeAccount({
+    //     brokerAccountId: account.brokerAccountId,
+    //   });
+    //   const p = await await this.apiService.getPortfolio();
+    //   x.push(p);
+    // }
     // const x = await this.apiService.getPortfolio();
-    return x;
+    return 'x';
   }
   async checkTrade() {
+    // Прогоняет по стратегии
     const trades = (
       await this.tradeRepository.find({
         relations: ['tool', 'account', 'strategy'],
@@ -324,6 +366,10 @@ export class TradeService extends LogService {
       // });
     }
     return trades;
+  }
+  async checkTradeByStrategy(strategyName: string) {
+    this.warn(`${strategyName}`);
+    console.log({ strategyName });
   }
   async сheckingPosition(trade: Trade, { asks, bids }: Orderbook) {
     // Стоит ли что то менять
